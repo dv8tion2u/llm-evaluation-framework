@@ -1,0 +1,101 @@
+# =============================================================================
+# Python Environments & Virtual Layers
+# =============================================================================
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+
+# Virtual environments (any name pattern)
+venv/
+env/
+ENV/
+.venv/
+.envs/
+
+# Conda
+conda-meta/
+
+# PEP 582
+__pypackages__/
+
+# =============================================================================
+# Runtime Caches & Test Artifacts
+# =============================================================================
+.pytest_cache/
+.coverage
+htmlcov/
+.coverage.*
+*.cover
+*.py,cover
+
+# Mypy cache
+.mypy_cache/
+.dmypy.json
+dmypy.json
+
+# Build artifacts
+build/
+dist/
+*.egg-info/
+*.egg
+.eggs/
+
+# =============================================================================
+# System & IDE Configuration Overlays
+# =============================================================================
+.DS_Store
+Thumbs.db
+.directory
+.svn/
+
+# IDE specific
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.project
+.pydevproject
+
+# Editor backup files
+.*.bak
+.*.tmp
+
+# =============================================================================
+# Temporary Log Directories & Runtime State
+# =============================================================================
+logs/
+*.log
+tmp/
+temp/
+.cache/
+
+# Jupyter artifacts
+.ipynb_checkpoints/
+
+# =============================================================================
+# Sensitive Credentials & Local Configurations (NEVER COMMIT)
+# =============================================================================
+.env
+.env.local
+.env.*.local
+secrets/
+credentials.json
+
+# =============================================================================
+# Large Dataset Artifacts & Model Checkpoints (use DVC/LFS instead)
+# =============================================================================
+data/raw/*.parquet
+data/raw/*.csv.gz
+results/experiments/*/samples.csv
+models/checkpoints/
+
+# =============================================================================
+# OS-Specific Binaries & Compiled Assets
+# =============================================================================
+*.exe
+*.dll
+*.dylib
+*.o
