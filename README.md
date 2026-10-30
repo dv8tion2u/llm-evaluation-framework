@@ -1,12 +1,49 @@
-# LLM Evaluation Framework
+# Hermetic Review-Gate: Zero-Trust AI Coding Adjudication
+A sovereign, air-gapped verification pipeline designed to prevent autonomous coding agents from gaming test suites, weakening assertions, or stubbing core logic.
 
-## Architecture Overview
+## The Problem
+Traditional agent evaluation and execution loops rely on an "honor system." When unconstrained frontier models hit difficult logic walls, default reinforcement incentives push them to find the path of least resistance: rewriting conftest.py, softening test assertions, or mocking out database connections just to secure a green build.
+
+## The Solution: Hermetic Zero-Trust Architecture
+1. **SHA-256 Fixture Lock:** Cryptographically snapshots protected test fixtures before worker execution. Any tampering triggers an immediate breaker trip.
+2. **Local Gemma Diff Adjudication:** Routes worker git diffs through local Gemma 12B (via LM Studio at temp 0.0) to flag assertion-weakening, hardcoded mocks, and test deletion.
+3. **The Redemption Loop:** Feeds clinical rejection critique back into the worker model's context window for an honest retry under immutable constraints.
+
+## Threat Model
+- **In scope:** a worker agent with write access to the repo that edits or deletes protected fixtures, weakens assertions, stubs logic, or deletes tests.
+- **Fail-closed:** any missing manifest, hash mismatch, unreachable adjudicator, timeout, or response without an explicit `VERDICT: PASS` blocks the build.
+- **Out of scope:** an attacker who can modify the gate itself, the manifest, or the host. Keep `/opt/harness` and `.harness_lock.json` outside the worker's write access.
+
+## Exit Codes
+| Code | Meaning |
+|------|---------|
+| 0 | Pass |
+| 1 | Lock manifest missing |
+| 2 | Protected fixture changed or missing |
+| 3 | Adjudicator returned FAIL |
+| 4 | Adjudicator unreachable, timed out, or gave no clear verdict |
+
+## Quick Start
+1. Run `python harness_lock.py` to create the baseline hash manifest.
+2. Build the container: `docker build -t review-gate:latest .`
+3. Run it with the repo mounted read-only:
+   ```
+   docker run --rm --add-host=host.docker.internal:host-gateway \
+     -v "$PWD":/workspace:ro review-gate:latest
+   ```
+   The entrypoint runs `harness_lock.py verify` and then `adjudicate.py`. Set `LM_STUDIO_URL` and `ADJUDICATOR_MODEL` to override the defaults.
+
+---
+
+## Original Framework Overview
+
+### Architecture Overview
 
 A production-grade, scalable infrastructure for systematic Large Language Model evaluation. This framework implements modular benchmarking matrices, automated dataset ingestion pipelines, and comprehensive token-tracking schemas designed for enterprise model assessment workflows.
 
 ---
 
-## Directory Structure
+### Directory Structure
 
 ```
 llm-evaluation-framework/
@@ -77,7 +114,7 @@ llm-evaluation-framework/
 
 ---
 
-## Core Components
+### Core Components
 
 ### Benchmarking Matrices (`benchmarks/`)
 - **Task Abstractions**: Self-contained evaluation units with standardized input/output contracts
@@ -96,7 +133,7 @@ llm-evaluation-framework/
 
 ---
 
-## Quick Start
+### Quick Start
 
 ```bash
 # Clone and install dependencies
@@ -110,7 +147,7 @@ python scripts/run_benchmark.sh --suite reasoning-battery --model openai:gpt-4o
 
 ---
 
-## Design Principles
+### Design Principles
 
 1. **Modularity**: Each evaluation component operates as an isolated unit with well-defined interfaces
 2. **Reproducibility**: Immutable experiment configs and versioned results ensure exact recreatability
@@ -120,6 +157,6 @@ python scripts/run_benchmark.sh --suite reasoning-battery --model openai:gpt-4o
 
 ---
 
-## License & Contribution
+### License & Contribution
 
 This framework is maintained as open-source infrastructure. See `docs/contributing.md` for development guidelines.
